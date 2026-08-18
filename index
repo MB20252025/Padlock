@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clickable Padlock</title>
+    <style>
+        /* ----- reset & centering ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #2c3e50;
+        }
+
+        /* ----- wrapper keeps image + overlays together ----- */
+        .lock-wrapper {
+            position: relative;
+            display: inline-block;
+            /* Let the image set the natural size */
+        }
+
+        .lock-wrapper img {
+            display: block;
+            max-width: 90vw;
+            max-height: 90vh;
+            height: auto;
+            width: auto;
+            /* keeps the image crisp and exact */
+            border-radius: 8px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        /* ============================================================
+               OVERLAY PATCHES – OPTIONAL
+               Uncomment these blocks to hide "CODE: 352" and "MASTER COMBO"
+               You may need to adjust the `top`/`left`/`width`/`height`
+               to match your specific image dimensions.
+               ============================================================ */
+        /*
+        .lock-wrapper .text-patch {
+            position: absolute;
+            background: #f0f0f0;    /* match the padlock's body colour *
+            border-radius: 4px;
+            pointer-events: none;   /* allow clicks to pass through *
+        }
+        /* patch for "CODE: 352" – adjust these values *
+        .lock-wrapper .patch-code {
+            top: 8%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 30px;
+        }
+        /* patch for "MASTER COMBO" – adjust these values *
+        .lock-wrapper .patch-master {
+            bottom: 6%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 130px;
+            height: 28px;
+        }
+        */
+
+        /* ============================================================
+               CLICKABLE DIAL OVERLAYS
+               Place these exactly over the numbers in your image.
+               ============================================================ */
+        .dial {
+            position: absolute;
+            /* ---- 👇 ADJUST THESE TO ALIGN WITH YOUR IMAGE ---- */
+            top: 38%;          /* vertical position of the dials */
+            width: 48px;       /* width of each clickable area */
+            height: 48px;      /* height of each clickable area */
+            transform: translate(-50%, -50%);
+            /* ---- 👆 ADJUST THE ABOVE ---- */
+
+            text-align: center;
+            line-height: 48px;
+            font-size: 30px;
+            font-weight: 700;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #f5f5f5;        /* match the digit colour in your image */
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+            background: transparent; /* fully transparent – only the number shows */
+            border-radius: 50%;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.08s ease;
+            /* optional slight glow so it feels interactive */
+            /* background: rgba(255,255,255,0.05); */ 
+        }
+
+        /* horizontal spacing – adjust left values */
+        #dial1 { left: 30%; }   /* first dial */
+        #dial2 { left: 50%; }   /* second dial */
+        #dial3 { left: 70%; }   /* third dial */
+
+        /* subtle press feedback */
+        .dial:active {
+            transform: translate(-50%, -50%) scale(0.88);
+        }
+
+        /* small hint that they are clickable (optional) */
+        .dial:hover {
+            filter: brightness(1.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="lock-wrapper">
+        <!-- ===== YOUR EXACT IMAGE ===== -->
+        <img src="1000172801_5685626281082196383.webp" alt="Padlock" />
+
+        <!-- ===== OPTIONAL TEXT PATCHES (uncomment in CSS) ===== -->
+        <!-- <div class="text-patch patch-code"></div> -->
+        <!-- <div class="text-patch patch-master"></div> -->
+
+        <!-- ===== THREE CLICKABLE DIALS ===== -->
+        <div class="dial" id="dial1">3</div>
+        <div class="dial" id="dial2">6</div>
+        <div class="dial" id="dial3">2</div>
+    </div>
+
+    <script>
+        (function() {
+            const dials = document.querySelectorAll('.dial');
+
+            dials.forEach(dial => {
+                dial.addEventListener('click', function(e) {
+                    e.stopPropagation();   // avoid any parent clicks
+
+                    // get current number (0‑9)
+                    let val = parseInt(this.textContent, 10);
+                    if (isNaN(val) || val < 0 || val > 9) val = 0;
+
+                    // rotate to next digit (wrap 9 → 0)
+                    val = (val + 1) % 10;
+                    this.textContent = val;
+
+                    // (Optional) you could log the new combination:
+                    // console.log(`Combination: ${document.getElementById('dial1').textContent}${document.getElementById('dial2').textContent}${document.getElementById('dial3').textContent}`);
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
