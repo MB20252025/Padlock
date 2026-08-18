@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Clickable Padlock</title>
+    <title>Locker Padlocks</title>
     <style>
-        /* ----- reset & centering ----- */
+        /* ----- RESET & BODY ----- */
         * {
             margin: 0;
             padding: 0;
@@ -16,203 +16,429 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: #2c3e50;
+            background: #1e2a36;
+            font-family: 'Segoe UI', Arial, sans-serif;
         }
 
-        /* ----- wrapper keeps image + overlays together ----- */
-        .lock-wrapper {
+        /* ----- LOCKER VIEW (background + small locks) ----- */
+        .locker-wrapper {
             position: relative;
             display: inline-block;
+            border-radius: 12px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
         }
-
-        .lock-wrapper img {
+        .locker-wrapper img {
             display: block;
-            max-width: 90vw;
-            max-height: 90vh;
+            max-width: 92vw;
+            max-height: 92vh;
             height: auto;
             width: auto;
-            border-radius: 8px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
-            transition: opacity 0.5s ease;
+            border-radius: 12px;
         }
 
         /* ============================================================
-               CLICKABLE DIAL OVERLAYS
+               SMALL PADLOCKS ON THE LOCKERS
                ============================================================ */
-        .dial {
+        .locker-padlock {
             position: absolute;
-            /* ---- 👇 DEFAULT POSITION (for locked state) ---- */
-            top: 69.2%;
-            width: 48px;
-            height: 48px;
+            /* ----- DEFAULT POSITION (applies to ALL unless overridden) ----- */
+            left: 72%;          /* 👈 Change this to move ALL padlocks left/right */
+            width: 50px;        /* 👈 Change this to make ALL padlocks bigger/smaller */
+            height: auto;
             transform: translate(-50%, -50%);
-            /* ---- 👆 ADJUST THE ABOVE ---- */
+            cursor: pointer;
+            transition: transform 0.15s ease, filter 0.15s ease;
+            padding: 4px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 215, 0, 0.15);
+        }
+        .locker-padlock:hover {
+            transform: translate(-50%, -50%) scale(1.15);
+            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.5));
+            border-color: rgba(255, 215, 0, 0.4);
+        }
+        .locker-padlock:active {
+            transform: translate(-50%, -50%) scale(0.92);
+        }
+        .locker-padlock img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        /* ============================================================
+               INDIVIDUAL PADLOCK POSITIONS (adjust these!)
+               ============================================================ */
+        #lock1 {
+            top: 33%;           /* 👈 Vertical position for locker 1 */
+            left: 5.5%;          /* 👈 Optional: override horizontal */
+        }
+        #lock2 {
+            top: 33%;
+            left: 38%;
+        }
+        #lock3 {
+            top: 33%;
+            left: 71%;
+        }
+        #lock4 {
+            top: 69%;
+            left: 5.5%;
+        }
+        #lock5 {
+            top: 69%;
+            left: 38%;
+        }
+        #lock6 {
+            top: 69%;
+            left: 71%;
+        }
+
+        /* ============================================================
+           MODAL – zoomed padlock with transparent number overlays
+           ============================================================ */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(6px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 420px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Close button */
+        .modal-close {
+            position: absolute;
+            top: -18px;
+            right: -18px;
+            width: 44px;
+            height: 44px;
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            font-size: 26px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+            transition: transform 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 10;
+        }
+        .modal-close:hover {
+            transform: scale(1.1);
+            background: #c0392b;
+        }
+        .modal-close:active {
+            transform: scale(0.9);
+        }
+
+        /* ----- The actual padlock image wrapper ----- */
+        .modal-padlock-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            background: #000;
+        }
+
+        .modal-padlock-wrapper img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        /* ============================================================
+               TRANSPARENT NUMBER OVERLAYS – LOCKED STATE (padlock.png)
+               ============================================================ */
+        .modal-dial {
+            position: absolute;
+            /* --- 👇 POSITIONS FOR THE LOCKED IMAGE (padlock.png) --- */
+            top: 69.2%;           /* moves all numbers up/down */
+            width: 14%;         /* clickable width */
+            height: 16%;        /* clickable height */
+            transform: translate(-50%, -50%);
+            /* --- 👆 ADJUST THE ABOVE --- */
 
             text-align: center;
-            line-height: 48px;
-            font-size: 30px;
+            font-size: clamp(28px, 6vw, 48px);
             font-weight: 700;
             font-family: 'Segoe UI', Arial, sans-serif;
-            color: black;
-            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
-            background: transparent;
-            border-radius: 50%;
+            color: #000;          /* BLACK numbers – matches padlock dials */
+            text-shadow: 0 2px 8px rgba(255, 255, 255, 0.3);
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
             cursor: pointer;
             user-select: none;
-            transition: top 0.5s ease, left 0.5s ease, transform 0.08s ease, opacity 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.08s ease, opacity 0.3s ease;
+            line-height: 1;
         }
 
-        /* horizontal spacing – adjust left values (locked state) */
-        #dial1 { left: 29%; }
-        #dial2 { left: 50.5%; }
-        #dial3 { left: 72.5%; }
+        /* Horizontal positions for the LOCKED state (padlock.png) */
+        #modalDial1 { left: 29%; }   /* first dial */
+        #modalDial2 { left: 50.6%; }   /* second dial */
+        #modalDial3 { left: 73%; }   /* third dial */
 
-        /* ---- 👇 UNLOCKED STATE POSITIONS (adjust these) ---- */
-        #dial1.unlocked { 
-            top: 71%;     /* move down */
-            left: 29%;    /* move left */
-        }
-        #dial2.unlocked { 
-            top: 71%;     /* move down */
-            left: 51%;    /* stay centered */
-        }
-        #dial3.unlocked { 
-            top: 71%;     /* move down */
-            left: 73%;    /* move right */
+        /* ============================================================
+               TRANSPARENT NUMBER OVERLAYS – UNLOCKED STATE (padlock2.png)
+               These override the positions when the padlock is unlocked.
+               ============================================================ */
+        .modal-dial.unlocked {
+            /* --- 👇 POSITIONS FOR THE UNLOCKED IMAGE (padlock2.png) --- */
+            top: 70.7%;           /* 👈 Adjust these for padlock2.png */
+            /* --- 👆 ADJUST THE ABOVE --- */
+            cursor: default;    /* not clickable when unlocked */
         }
 
-        /* subtle press feedback (only when clickable) */
-        .dial:active {
+        /* Horizontal positions for the UNLOCKED state (padlock2.png) */
+        #modalDial1.unlocked { left: 29%; }   /* 👈 Adjust first dial for padlock2 */
+        #modalDial2.unlocked { left: 50.6%; }   /* 👈 Adjust second dial for padlock2 */
+        #modalDial3.unlocked { left: 73%; }   /* 👈 Adjust third dial for padlock2 */
+
+        /* ============================================================ */
+
+        .modal-dial:active {
             transform: translate(-50%, -50%) scale(0.88);
         }
-
-        .dial:hover {
-            filter: brightness(1.2);
+        .modal-dial:hover {
+            filter: brightness(1.5);
         }
 
-        /* ===== UNLOCKED STATE FOR DIALS ===== */
-        .dial.unlocked {
-            cursor: default !important;
-            pointer-events: none !important;
-            /* Color stays black */
+        /* Disable hover effects when unlocked */
+        .modal-dial.unlocked:hover {
+            filter: none;
         }
 
-        /* ===== SUCCESS MESSAGE ===== */
-        .success-message {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #2ecc71;
-            font-size: 28px;
+        /* ----- Unlock message ----- */
+        .modal-message {
+            margin-top: 16px;
+            font-size: 24px;
             font-weight: 700;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
-            background: rgba(0, 0, 0, 0.6);
-            padding: 20px 40px;
-            border-radius: 12px;
-            pointer-events: none;
+            color: #2ecc71;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+            min-height: 40px;
+            text-align: center;
             opacity: 0;
-            transition: opacity 0.5s ease;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            transition: opacity 0.3s ease;
+        }
+        .modal-message.show {
+            opacity: 1;
         }
 
-        .success-message.show {
-            opacity: 1;
+        /* ----- Responsive tweaks ----- */
+        @media (max-width: 500px) {
+            .modal-close {
+                top: -10px;
+                right: -10px;
+                width: 36px;
+                height: 36px;
+                font-size: 20px;
+            }
+            .locker-padlock {
+                width: 35px;
+            }
+            .modal-dial {
+                font-size: clamp(20px, 5vw, 32px);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="lock-wrapper">
-        <!-- ===== PADLOCK IMAGE ===== -->
-        <img id="lockImage" src="Padlock.png" alt="Padlock" />
 
-        <!-- ===== SUCCESS MESSAGE ===== -->
-        <div class="success-message" id="successMessage">🔓 UNLOCKED!</div>
+    <!-- ==========================================================
+    LOCKER VIEW
+    ========================================================== -->
+    <div class="locker-wrapper">
+        <img src="locker.png" alt="Lockers 1–6" />
 
-        <!-- ===== THREE CLICKABLE DIALS ===== -->
-        <div class="dial" id="dial1">3</div>
-        <div class="dial" id="dial2">6</div>
-        <div class="dial" id="dial3">2</div>
+        <!-- 6 small padlocks – each with its own secret code -->
+        <div class="locker-padlock" id="lock1" data-locker="1" data-code="352">
+            <img src="padlock.png" alt="Padlock" onerror="this.onerror=null; this.src='padlock2.png';" />
+        </div>
+        <div class="locker-padlock" id="lock2" data-locker="2" data-code="123">
+            <img src="padlock.png" alt="Padlock" onerror="this.onerror=null; this.src='padlock2.png';" />
+        </div>
+        <div class="locker-padlock" id="lock3" data-locker="3" data-code="789">
+            <img src="padlock.png" alt="Padlock" onerror="this.onerror=null; this.src='padlock2.png';" />
+        </div>
+        <div class="locker-padlock" id="lock4" data-locker="4" data-code="000">
+            <img src="padlock.png" alt="Padlock" onerror="this.onerror=null; this.src='padlock2.png';" />
+        </div>
+        <div class="locker-padlock" id="lock5" data-locker="5" data-code="555">
+            <img src="padlock.png" alt="Padlock" onerror="this.onerror=null; this.src='padlock2.png';" />
+        </div>
+        <div class="locker-padlock" id="lock6" data-locker="6" data-code="999">
+            <img src="padlock.png" alt="Padlock" onerror="this.onerror=null; this.src='padlock2.png';" />
+        </div>
     </div>
 
+    <!-- ==========================================================
+    MODAL – zoomed padlock with black transparent numbers
+    ========================================================== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">✕</button>
+
+            <div class="modal-padlock-wrapper">
+                <img src="padlock.png" alt="Padlock" id="padlockImg"
+                     onerror="this.onerror=null; this.src='padlock2.png';" />
+
+                <!-- Three clickable number overlays -->
+                <div class="modal-dial" id="modalDial1">0</div>
+                <div class="modal-dial" id="modalDial2">0</div>
+                <div class="modal-dial" id="modalDial3">0</div>
+            </div>
+
+            <div class="modal-message" id="modalMessage"></div>
+        </div>
+    </div>
+
+    <!-- ==========================================================
+    JAVASCRIPT
+    ========================================================== -->
     <script>
         (function() {
-            // ==== SETTINGS ====
-            const SECRET_CODE = [6, 6, 6];
-            const UNLOCKED_IMAGE = 'Padlock2.png';
-            const LOCKED_IMAGE = 'Padlock.png';
-            const DEFAULT_VALUES = [3, 6, 2];
+            // ----- DOM refs -----
+            const overlay = document.getElementById('modalOverlay');
+            const closeBtn = document.getElementById('modalClose');
+            const padlockImg = document.getElementById('padlockImg');
+            const padlockIcons = document.querySelectorAll('.locker-padlock');
+            const dials = [
+                document.getElementById('modalDial1'),
+                document.getElementById('modalDial2'),
+                document.getElementById('modalDial3')
+            ];
+            const messageEl = document.getElementById('modalMessage');
 
-            // ==== DOM ELEMENTS ====
-            const dials = document.querySelectorAll('.dial');
-            const lockImage = document.getElementById('lockImage');
-            const successMessage = document.getElementById('successMessage');
-
-            // ==== STATE TRACKING ====
+            let currentSecretCode = [0, 0, 0];
             let isUnlocked = false;
 
-            // ==== FUNCTION TO CHECK COMBINATION ====
-            function checkCombination() {
+            // ----- 1. MODAL OPEN / CLOSE -----
+            padlockIcons.forEach(icon => {
+                icon.addEventListener('click', function(e) {
+                    e.stopPropagation();
+
+                    // ---- RESET for a fresh attempt ----
+                    padlockImg.src = 'padlock.png';
+                    
+                    // Remove unlocked class from dials (back to locked positions)
+                    dials.forEach(dial => {
+                        dial.classList.remove('unlocked');
+                        dial.textContent = '0';
+                        dial.dataset.value = '0';
+                    });
+                    
+                    // Clear message
+                    messageEl.textContent = '';
+                    messageEl.classList.remove('show');
+                    // Allow clicks again
+                    isUnlocked = false;
+
+                    // Load the secret code for this locker
+                    const codeStr = this.dataset.code;
+                    if (codeStr && codeStr.length === 3) {
+                        currentSecretCode = codeStr.split('').map(Number);
+                    } else {
+                        currentSecretCode = [0, 0, 0];
+                    }
+
+                    overlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+
+            function closeModal() {
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            closeBtn.addEventListener('click', closeModal);
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) closeModal();
+            });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && overlay.classList.contains('active')) {
+                    closeModal();
+                }
+            });
+
+            // ----- 2. ROTATING DIALS + AUTO-UNLOCK -----
+            function checkAndUnlock() {
                 if (isUnlocked) return;
 
-                const currentCode = Array.from(dials).map(d => parseInt(d.textContent, 10));
-                const isCorrect = currentCode.length === SECRET_CODE.length &&
-                                  currentCode.every((val, index) => val === SECRET_CODE[index]);
+                const currentCode = dials.map(d => parseInt(d.dataset.value, 10));
+                const isCorrect = currentCode.length === currentSecretCode.length &&
+                                  currentCode.every((v, i) => v === currentSecretCode[i]);
 
                 if (isCorrect) {
                     isUnlocked = true;
-                    
-                    lockImage.src = UNLOCKED_IMAGE;
-                    successMessage.classList.add('show');
-                    
+
+                    // Swap to unlocked image
+                    padlockImg.src = 'padlock2.png';
+
+                    // ---- SWITCH TO UNLOCKED POSITIONS ----
                     dials.forEach(dial => {
                         dial.classList.add('unlocked');
                     });
-                    
-                    console.log('🔓 Unlocked! Code:', currentCode.join(''));
+
+                    // Show success message
+                    messageEl.textContent = '🔓 Unlocked!';
+                    messageEl.classList.add('show');
                 }
             }
 
-            // ==== SET UP DIAL CLICK EVENTS ====
+            // Initialize each dial
             dials.forEach(dial => {
+                let val = parseInt(dial.textContent, 10);
+                if (isNaN(val) || val < 0 || val > 9) val = 0;
+                dial.dataset.value = val;
+
                 dial.addEventListener('click', function(e) {
                     e.stopPropagation();
-
+                    // If unlocked, ignore clicks – dials are frozen
                     if (isUnlocked) return;
 
-                    let val = parseInt(this.textContent, 10);
-                    if (isNaN(val) || val < 0 || val > 9) val = 0;
+                    let v = parseInt(this.dataset.value, 10);
+                    v = (v + 1) % 10;
+                    this.dataset.value = v;
+                    this.textContent = v;
 
-                    val = (val + 1) % 10;
-                    this.textContent = val;
-
-                    checkCombination();
+                    checkAndUnlock();
                 });
             });
 
-            // ==== RESET FUNCTION =====
-            function resetLock() {
-                isUnlocked = false;
-                lockImage.src = LOCKED_IMAGE;
-                
-                dials.forEach((dial, index) => {
-                    dial.textContent = DEFAULT_VALUES[index];
-                    dial.classList.remove('unlocked');
-                });
-                
-                successMessage.classList.remove('show');
-                console.log('🔄 Reset to locked state');
-            }
-
-            lockImage.addEventListener('dblclick', resetLock);
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'r' || e.key === 'R') {
-                    resetLock();
-                }
-            });
-
-            console.log('🔐 Padlock loaded! Enter 666 to unlock.');
-            console.log('💡 Double-click image or press "R" to reset.');
         })();
     </script>
 </body>
