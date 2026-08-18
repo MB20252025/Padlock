@@ -23,7 +23,6 @@
         .lock-wrapper {
             position: relative;
             display: inline-block;
-            /* Let the image set the natural size */
         }
 
         .lock-wrapper img {
@@ -32,7 +31,6 @@
             max-height: 90vh;
             height: auto;
             width: auto;
-            /* keeps the image crisp and exact */
             border-radius: 8px;
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
             transition: opacity 0.5s ease;
@@ -40,14 +38,13 @@
 
         /* ============================================================
                CLICKABLE DIAL OVERLAYS
-               Place these exactly over the numbers in your image.
                ============================================================ */
         .dial {
             position: absolute;
-            /* ---- 👇 ADJUST THESE TO ALIGN WITH YOUR IMAGE ---- */
-            top: 69.2%;          /* vertical position of the dials */
-            width: 48px;       /* width of each clickable area */
-            height: 48px;      /* height of each clickable area */
+            /* ---- 👇 DEFAULT POSITION (for locked state) ---- */
+            top: 69.2%;
+            width: 48px;
+            height: 48px;
             transform: translate(-50%, -50%);
             /* ---- 👆 ADJUST THE ABOVE ---- */
 
@@ -62,25 +59,45 @@
             border-radius: 50%;
             cursor: pointer;
             user-select: none;
-            transition: transform 0.08s ease;
+            transition: top 0.5s ease, left 0.5s ease, transform 0.08s ease, opacity 0.3s ease;
         }
 
-        /* horizontal spacing – adjust left values */
-        #dial1 { left: 29%; }   /* first dial */
-        #dial2 { left: 50.5%; }   /* second dial */
-        #dial3 { left: 72.5%; }   /* third dial */
+        /* horizontal spacing – adjust left values (locked state) */
+        #dial1 { left: 29%; }
+        #dial2 { left: 50.5%; }
+        #dial3 { left: 72.5%; }
 
-        /* subtle press feedback */
+        /* ---- 👇 UNLOCKED STATE POSITIONS (adjust these) ---- */
+        #dial1.unlocked { 
+            top: 71%;     /* move down */
+            left: 29%;    /* move left */
+        }
+        #dial2.unlocked { 
+            top: 71%;     /* move down */
+            left: 51%;    /* stay centered */
+        }
+        #dial3.unlocked { 
+            top: 71%;     /* move down */
+            left: 73%;    /* move right */
+        }
+
+        /* subtle press feedback (only when clickable) */
         .dial:active {
             transform: translate(-50%, -50%) scale(0.88);
         }
 
-        /* small hint that they are clickable (optional) */
         .dial:hover {
             filter: brightness(1.2);
         }
 
-        /* Success message styling */
+        /* ===== UNLOCKED STATE FOR DIALS ===== */
+        .dial.unlocked {
+            cursor: default !important;
+            pointer-events: none !important;
+            /* Color stays black */
+        }
+
+        /* ===== SUCCESS MESSAGE ===== */
         .success-message {
             position: absolute;
             top: 50%;
@@ -109,7 +126,7 @@
         <!-- ===== PADLOCK IMAGE ===== -->
         <img id="lockImage" src="Padlock.png" alt="Padlock" />
 
-        <!-- ===== SUCCESS MESSAGE (appears when unlocked) ===== -->
+        <!-- ===== SUCCESS MESSAGE ===== -->
         <div class="success-message" id="successMessage">🔓 UNLOCKED!</div>
 
         <!-- ===== THREE CLICKABLE DIALS ===== -->
@@ -121,37 +138,38 @@
     <script>
         (function() {
             // ==== SETTINGS ====
-            const SECRET_CODE = [6, 6, 6];  // <-- CHANGE THIS TO YOUR SECRET CODE
-            const UNLOCKED_IMAGE = 'Padlock2.png';  // <-- image shown when unlocked
+            const SECRET_CODE = [6, 6, 6];
+            const UNLOCKED_IMAGE = 'Padlock2.png';
+            const LOCKED_IMAGE = 'Padlock.png';
+            const DEFAULT_VALUES = [3, 6, 2];
 
             // ==== DOM ELEMENTS ====
             const dials = document.querySelectorAll('.dial');
             const lockImage = document.getElementById('lockImage');
             const successMessage = document.getElementById('successMessage');
 
+            // ==== STATE TRACKING ====
+            let isUnlocked = false;
+
             // ==== FUNCTION TO CHECK COMBINATION ====
             function checkCombination() {
-                // Get current values from dials
+                if (isUnlocked) return;
+
                 const currentCode = Array.from(dials).map(d => parseInt(d.textContent, 10));
-                
-                // Check if it matches the secret code
                 const isCorrect = currentCode.length === SECRET_CODE.length &&
                                   currentCode.every((val, index) => val === SECRET_CODE[index]);
 
                 if (isCorrect) {
-                    // Switch to unlocked image
-                    lockImage.src = UNLOCKED_IMAGE;
+                    isUnlocked = true;
                     
-                    // Show success message
+                    lockImage.src = UNLOCKED_IMAGE;
                     successMessage.classList.add('show');
                     
-                    // Hide dials (optional - they're no longer needed)
                     dials.forEach(dial => {
-                        dial.style.display = 'none';
+                        dial.classList.add('unlocked');
                     });
                     
-                    // Optional: Play a sound or trigger other effects here
-                    console.log('🔓 Unlocked!');
+                    console.log('🔓 Unlocked! Code:', currentCode.join(''));
                 }
             }
 
@@ -160,36 +178,41 @@
                 dial.addEventListener('click', function(e) {
                     e.stopPropagation();
 
-                    // Get current number (0-9)
+                    if (isUnlocked) return;
+
                     let val = parseInt(this.textContent, 10);
                     if (isNaN(val) || val < 0 || val > 9) val = 0;
 
-                    // Rotate to next digit (wrap 9 → 0)
                     val = (val + 1) % 10;
                     this.textContent = val;
 
-                    // Check if the combination is correct
                     checkCombination();
                 });
             });
 
-            // ==== OPTIONAL: Reset ability (double-click the image to reset) ====
-            lockImage.addEventListener('dblclick', function() {
-                // Reset to locked image
-                this.src = 'Padlock.png';
+            // ==== RESET FUNCTION =====
+            function resetLock() {
+                isUnlocked = false;
+                lockImage.src = LOCKED_IMAGE;
                 
-                // Reset dials to default (3, 6, 2)
-                const defaultValues = [3, 6, 2];
                 dials.forEach((dial, index) => {
-                    dial.textContent = defaultValues[index];
-                    dial.style.display = 'block';
+                    dial.textContent = DEFAULT_VALUES[index];
+                    dial.classList.remove('unlocked');
                 });
                 
-                // Hide success message
                 successMessage.classList.remove('show');
-                
                 console.log('🔄 Reset to locked state');
+            }
+
+            lockImage.addEventListener('dblclick', resetLock);
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'r' || e.key === 'R') {
+                    resetLock();
+                }
             });
+
+            console.log('🔐 Padlock loaded! Enter 666 to unlock.');
+            console.log('💡 Double-click image or press "R" to reset.');
         })();
     </script>
 </body>
