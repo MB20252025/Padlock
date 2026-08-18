@@ -157,7 +157,7 @@
         }
 
         /* ============================================================
-               TRANSPARENT NUMBER OVERLAYS – LOCKED STATE (padlock.png)
+               TRANSPARENT NUMBER OVERLAYS – LOCKED STATE (Padlock.png)
                ============================================================ */
         .modal-dial {
             position: absolute;
@@ -184,20 +184,20 @@
             line-height: 1;
         }
 
-        /* Horizontal positions for the LOCKED state (padlock.png) */
+        /* Horizontal positions for the LOCKED state (Padlock.png) */
         #modalDial1 { left: 29%; }
         #modalDial2 { left: 50%; }
         #modalDial3 { left: 71%; }
 
         /* ============================================================
-               TRANSPARENT NUMBER OVERLAYS – UNLOCKED STATE (padlock2.png)
+               TRANSPARENT NUMBER OVERLAYS – UNLOCKED STATE (Padlock2.png)
                ============================================================ */
         .modal-dial.unlocked {
             top: 46%;
             cursor: default;
         }
 
-        /* Horizontal positions for the UNLOCKED state (padlock2.png) */
+        /* Horizontal positions for the UNLOCKED state (Padlock2.png) */
         #modalDial1.unlocked { left: 30%; }
         #modalDial2.unlocked { left: 51%; }
         #modalDial3.unlocked { left: 72%; }
@@ -256,22 +256,22 @@
 
         <!-- 6 small padlocks – each with its own secret code -->
         <div class="locker-padlock" id="lock1" data-locker="1" data-code="352">
-            <img src="padlock.png" alt="Padlock" onerror="this.onerror=null; this.src='padlock2.png';" />
+            <img src="Padlock.png" alt="Padlock" onerror="this.onerror=null; this.src='Padlock2.png';" />
         </div>
         <div class="locker-padlock" id="lock2" data-locker="2" data-code="123">
-            <img src="padlock.png" alt="Padlock" onerror="this.onerror=null; this.src='padlock2.png';" />
+            <img src="Padlock.png" alt="Padlock" onerror="this.onerror=null; this.src='Padlock2.png';" />
         </div>
         <div class="locker-padlock" id="lock3" data-locker="3" data-code="789">
-            <img src="padlock.png" alt="Padlock" onerror="this.onerror=null; this.src='padlock2.png';" />
+            <img src="Padlock.png" alt="Padlock" onerror="this.onerror=null; this.src='Padlock2.png';" />
         </div>
         <div class="locker-padlock" id="lock4" data-locker="4" data-code="000">
-            <img src="padlock.png" alt="Padlock" onerror="this.onerror=null; this.src='padlock2.png';" />
+            <img src="Padlock.png" alt="Padlock" onerror="this.onerror=null; this.src='Padlock2.png';" />
         </div>
         <div class="locker-padlock" id="lock5" data-locker="5" data-code="555">
-            <img src="padlock.png" alt="Padlock" onerror="this.onerror=null; this.src='padlock2.png';" />
+            <img src="Padlock.png" alt="Padlock" onerror="this.onerror=null; this.src='Padlock2.png';" />
         </div>
         <div class="locker-padlock" id="lock6" data-locker="6" data-code="999">
-            <img src="padlock.png" alt="Padlock" onerror="this.onerror=null; this.src='padlock2.png';" />
+            <img src="Padlock.png" alt="Padlock" onerror="this.onerror=null; this.src='Padlock2.png';" />
         </div>
     </div>
 
@@ -283,8 +283,8 @@
             <button class="modal-close" id="modalClose">✕</button>
 
             <div class="modal-padlock-wrapper">
-                <img src="padlock.png" alt="Padlock" id="padlockImg"
-                     onerror="this.onerror=null; this.src='padlock2.png';" />
+                <img src="Padlock.png" alt="Padlock" id="padlockImg"
+                     onerror="this.onerror=null; this.src='Padlock2.png';" />
 
                 <!-- Three clickable number overlays -->
                 <div class="modal-dial" id="modalDial1">0</div>
@@ -322,7 +322,7 @@
                     e.stopPropagation();
 
                     // ---- RESET for a fresh attempt ----
-                    padlockImg.src = 'padlock.png';
+                    padlockImg.src = 'Padlock.png';
                     
                     dials.forEach(function(dial) {
                         dial.classList.remove('unlocked');
@@ -371,7 +371,7 @@
 
                 if (isCorrect) {
                     isUnlocked = true;
-                    padlockImg.src = 'padlock2.png';
+                    padlockImg.src = 'Padlock2.png';
 
                     dials.forEach(function(dial) {
                         dial.classList.add('unlocked');
