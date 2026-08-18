@@ -35,38 +35,8 @@
             /* keeps the image crisp and exact */
             border-radius: 8px;
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+            transition: opacity 0.5s ease;
         }
-
-        /* ============================================================
-               OVERLAY PATCHES – OPTIONAL
-               Uncomment these blocks to hide "CODE: 352" and "MASTER COMBO"
-               You may need to adjust the `top`/`left`/`width`/`height`
-               to match your specific image dimensions.
-               ============================================================ */
-        /*
-        .lock-wrapper .text-patch {
-            position: absolute;
-            background: #f0f0f0;    /* match the padlock's body colour *
-            border-radius: 4px;
-            pointer-events: none;   /* allow clicks to pass through *
-        }
-        /* patch for "CODE: 352" – adjust these values *
-        .lock-wrapper .patch-code {
-            top: 8%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 120px;
-            height: 30px;
-        }
-        /* patch for "MASTER COMBO" – adjust these values *
-        .lock-wrapper .patch-master {
-            bottom: 6%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 130px;
-            height: 28px;
-        }
-        */
 
         /* ============================================================
                CLICKABLE DIAL OVERLAYS
@@ -86,15 +56,13 @@
             font-size: 30px;
             font-weight: 700;
             font-family: 'Segoe UI', Arial, sans-serif;
-            color: black;        /* match the digit colour in your image */
+            color: black;
             text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
-            background: transparent; /* fully transparent – only the number shows */
+            background: transparent;
             border-radius: 50%;
             cursor: pointer;
             user-select: none;
             transition: transform 0.08s ease;
-            /* optional slight glow so it feels interactive */
-            /* background: rgba(255,255,255,0.05); */ 
         }
 
         /* horizontal spacing – adjust left values */
@@ -111,16 +79,38 @@
         .dial:hover {
             filter: brightness(1.2);
         }
+
+        /* Success message styling */
+        .success-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #2ecc71;
+            font-size: 28px;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px 40px;
+            border-radius: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        .success-message.show {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
     <div class="lock-wrapper">
-        <!-- ===== YOUR EXACT IMAGE ===== -->
-        <img src="Padlock.png" alt="Padlock" />
+        <!-- ===== PADLOCK IMAGE ===== -->
+        <img id="lockImage" src="Padlock.png" alt="Padlock" />
 
-        <!-- ===== OPTIONAL TEXT PATCHES (uncomment in CSS) ===== -->
-        <!-- <div class="text-patch patch-code"></div> -->
-        <!-- <div class="text-patch patch-master"></div> -->
+        <!-- ===== SUCCESS MESSAGE (appears when unlocked) ===== -->
+        <div class="success-message" id="successMessage">🔓 UNLOCKED!</div>
 
         <!-- ===== THREE CLICKABLE DIALS ===== -->
         <div class="dial" id="dial1">3</div>
@@ -130,23 +120,75 @@
 
     <script>
         (function() {
-            const dials = document.querySelectorAll('.dial');
+            // ==== SETTINGS ====
+            const SECRET_CODE = [6, 6, 6];  // <-- CHANGE THIS TO YOUR SECRET CODE
+            const UNLOCKED_IMAGE = 'Padlock2.png';  // <-- image shown when unlocked
 
+            // ==== DOM ELEMENTS ====
+            const dials = document.querySelectorAll('.dial');
+            const lockImage = document.getElementById('lockImage');
+            const successMessage = document.getElementById('successMessage');
+
+            // ==== FUNCTION TO CHECK COMBINATION ====
+            function checkCombination() {
+                // Get current values from dials
+                const currentCode = Array.from(dials).map(d => parseInt(d.textContent, 10));
+                
+                // Check if it matches the secret code
+                const isCorrect = currentCode.length === SECRET_CODE.length &&
+                                  currentCode.every((val, index) => val === SECRET_CODE[index]);
+
+                if (isCorrect) {
+                    // Switch to unlocked image
+                    lockImage.src = UNLOCKED_IMAGE;
+                    
+                    // Show success message
+                    successMessage.classList.add('show');
+                    
+                    // Hide dials (optional - they're no longer needed)
+                    dials.forEach(dial => {
+                        dial.style.display = 'none';
+                    });
+                    
+                    // Optional: Play a sound or trigger other effects here
+                    console.log('🔓 Unlocked!');
+                }
+            }
+
+            // ==== SET UP DIAL CLICK EVENTS ====
             dials.forEach(dial => {
                 dial.addEventListener('click', function(e) {
-                    e.stopPropagation();   // avoid any parent clicks
+                    e.stopPropagation();
 
-                    // get current number (0‑9)
+                    // Get current number (0-9)
                     let val = parseInt(this.textContent, 10);
                     if (isNaN(val) || val < 0 || val > 9) val = 0;
 
-                    // rotate to next digit (wrap 9 → 0)
+                    // Rotate to next digit (wrap 9 → 0)
                     val = (val + 1) % 10;
                     this.textContent = val;
 
-                    // (Optional) you could log the new combination:
-                    // console.log(`Combination: ${document.getElementById('dial1').textContent}${document.getElementById('dial2').textContent}${document.getElementById('dial3').textContent}`);
+                    // Check if the combination is correct
+                    checkCombination();
                 });
+            });
+
+            // ==== OPTIONAL: Reset ability (double-click the image to reset) ====
+            lockImage.addEventListener('dblclick', function() {
+                // Reset to locked image
+                this.src = 'Padlock.png';
+                
+                // Reset dials to default (3, 6, 2)
+                const defaultValues = [3, 6, 2];
+                dials.forEach((dial, index) => {
+                    dial.textContent = defaultValues[index];
+                    dial.style.display = 'block';
+                });
+                
+                // Hide success message
+                successMessage.classList.remove('show');
+                
+                console.log('🔄 Reset to locked state');
             });
         })();
     </script>
