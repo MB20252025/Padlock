@@ -116,7 +116,7 @@
 <body>
     <div class="lock-wrapper">
         <!-- ===== YOUR EXACT IMAGE ===== -->
-        <img src="1000172801_5685626281082196383.webp" alt="Padlock" />
+        <img src="1000172801_5685626281082196383.png" alt="Padlock" />
 
         <!-- ===== OPTIONAL TEXT PATCHES (uncomment in CSS) ===== -->
         <!-- <div class="text-patch patch-code"></div> -->
